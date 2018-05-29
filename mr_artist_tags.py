@@ -5,6 +5,7 @@ import sqlite3
 import time
 import os.path
 import json
+from mrjob.step import MRStep
 
 
 class MRTagBag(MRJob):
@@ -19,8 +20,6 @@ class MRTagBag(MRJob):
 		self.sqlite_conn = sqlite3.connect(self.options.database1)
 		self.c = self.sqlite_conn.cursor()
 		self.c.execute("ATTACH DATABASE 'lastfm_tags.db' AS 'lastfm_tags'")
-
-
 
 
 
@@ -53,7 +52,7 @@ class MRTagBag(MRJob):
 	def reducer_init(self):
 		self.output_dictionary = {"data":[]}
 
-	def reducer(self, artist, tags):
+	def reducer1(self, artist, tags):
 		artist_dictionary = {}
 		artist_dictionary["artist"] = artist
 		artist_dictionary["tags"] = {}
@@ -61,8 +60,19 @@ class MRTagBag(MRJob):
 			artist_dictionary["tags"][tag] = artist_dictionary["tags"].get(tag,0) + 1
 		self.output_dictionary["data"].append(artist_dictionary)
 
-	def reducer_final(self):
+	def reducer1_final(self):
 		yield None, json.dumps(self.output_dictionary)
+
+	def reducer2(self, _, data):
+		
+
+	def steps(self):
+        return [MRStep(configure_options, mapper_init,
+                       mapper,
+                       mapper_final=self.final_get_words,
+                       combiner,
+                       reducer=self.reducer1, reducer_final=self.reducer1_final)
+        		MRStep(reducer=self.reducer2)]
 
 if __name__ == '__main__':
 	MRTagBag.run()
