@@ -38,12 +38,8 @@ class MRTagBag(MRJob):
 
 			yield an, tag
 
-	def combiner(self, artist, tags):
-		v = set(tags)
-		l = list(v)
-
-
-		yield artist, l
+	'''def combiner(self, artist, tag):
+		yield artist, tag'''
 
 	def reducer(self, artist, tags):
 		
