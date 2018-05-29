@@ -10,6 +10,7 @@ import math
 import pandas as pd 
 import numpy as np
 
+output_dictionary = {}
 
 class MRTagBag(MRJob):
 
@@ -52,19 +53,17 @@ class MRTagBag(MRJob):
 		for tag in tags:
 			yield artist, tag.lower()
 
-	def reducer_init(self):
-		self.output_dictionary = {}
 
 	def reducer1(self, artist, tags):
 		artist_dictionary = {}
 		for tag in tags:
 			artist_dictionary[tag] = artist_dictionary.get(tag,0) + 1
-		self.output_dictionary[artist] = artist_dictionary
+		output_dictionary[artist] = artist_dictionary
 		yield None, None
 
 	def reducer2(self, _, __):
 		
-		info = [{"artist": key, "tags": val} for key, val in self.output_dictionary.items()]
+		info = [{"artist": key, "tags": val} for key, val in output_dictionary.items()]
 		tag_artist_count = {}
 		tag_total_freqs = {}
 		for artist in info:
@@ -104,7 +103,7 @@ class MRTagBag(MRJob):
 	def steps(self):
 		return [ 
 		MRStep(mapper_init = self.mapper_init, mapper=self.mapper,
-		combiner=self.combiner,reducer_init = self.reducer_init, reducer=self.reducer1),
+		combiner=self.combiner, reducer=self.reducer1),
 		MRStep(reducer=self.reducer2)]
 
 if __name__ == '__main__':
