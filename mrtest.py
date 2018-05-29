@@ -11,21 +11,17 @@ class MRTagBag(MRJob):
 	def configure_options(self):
 		super(MRTagBag, self).configure_options()
 		self.add_file_option('--database1')
+		self.add_file_option('--database2')
 	
 	def mapper_init(self):
 		self.sqlite_conn = sqlite3.connect(self.options.database1)
 		self.c = self.sqlite_conn.cursor()
 		self.c.execute("ATTACH DATABASE 'lastfm_tags.db' AS 'lastfm_tags'")
 		
-		
-		
-
 
 	def mapper(self, _, line):
 		clean_line = line.strip()
 		track_id = clean_line
-		
-
 
 		queryResult = self.c.execute("SELECT songs.title, songs.artist_name, lastfm_tags.tags.tag\
         FROM lastfm_tags.tid_tag, lastfm_tags.tids, lastfm_tags.tags, songs\
@@ -39,13 +35,21 @@ class MRTagBag(MRJob):
 			if item == None:
 				break
 			tn, an, tag = item
-			yield an, set(tag)
+
+			yield an, tag
 
 	def combiner(self, artist, tags):
-		yield artist, set.union(tags)
+		v = set(tags)
+		l = list(v)
+
+
+		yield artist, l
 
 	def reducer(self, artist, tags):
-		yield artist, counts
+		
+		v = set(tags)
+		l = list(v)
+		yield artist, l
 
 
 if __name__ == '__main__':
