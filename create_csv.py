@@ -3,7 +3,6 @@ import sys
 import sqlite3
 import time
 
-
 dbfile = "track_metadata.db"
 conn = sqlite3.connect(dbfile)
 c = conn.cursor()

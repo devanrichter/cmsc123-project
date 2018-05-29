@@ -62,7 +62,7 @@ class MRTagBag(MRJob):
 		self.output_dictionary["data"].append(artist_dictionary)
 
 	def reducer_final(self):
-		yield None, self.output_dictionary
+		yield None, json.dumps(self.output_dictionary)
 
 if __name__ == '__main__':
 	MRTagBag.run()
