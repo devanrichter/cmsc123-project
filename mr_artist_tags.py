@@ -1,3 +1,4 @@
+#Danielle R., Devan R., JX X., Arthur J.
 from mrjob.job import MRJob
 import os
 import sys
@@ -92,6 +93,7 @@ class MRTagBag(MRJob):
 		for i, tup1 in enumerate(tf_idf_vecs):
 			for j, tup2 in enumerate(tf_idf_vecs[i + 1 :]):
 				pairs.append([tup1[0], tup2[0], np.dot(tup1[1], tup2[1]) / (np.linalg.norm(tup1[1]) * np.linalg.norm(tup2[1]))])
+				print([tup1[0], tup2[0], np.dot(tup1[1], tup2[1]) / (np.linalg.norm(tup1[1]) * np.linalg.norm(tup2[1]))])
 		df = pd.DataFrame(pairs, columns = ["Artist 1", "Artist 2", "Cosine Similarity"])
 		df = df.sort_values(by="Cosine Similarity", ascending = False)
 		df.to_csv("results.csv", index=False)
